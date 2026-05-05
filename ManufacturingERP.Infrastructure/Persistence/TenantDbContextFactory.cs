@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ManufacturingERP.Infrastructure.MultiTenancy;
 
-namespace ManufacturingERP.Infrastructure.Data;
+namespace ManufacturingERP.Infrastructure.Persistence;
 
 public class TenantDbContextFactory
 {

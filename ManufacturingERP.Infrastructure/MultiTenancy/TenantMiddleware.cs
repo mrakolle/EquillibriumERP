@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using ManufacturingERP.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using ManufacturingERP.Infrastructure.Persistence;
 
 namespace ManufacturingERP.Infrastructure.MultiTenancy;
 

@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using ManufacturingERP.Infrastructure.Data;
+using ManufacturingERP.Infrastructure.Persistence; 
 using ManufacturingERP.Infrastructure.MultiTenancy;
+using ManufacturingERP.Application.Common.Interfaces;
+using ManufacturingERP.Infrastructure.Persistence.Seed;
 using Hangfire;
 using Hangfire.PostgreSql;
 
@@ -30,6 +32,9 @@ public static class InfrastructureServiceRegistration
 
         // TENANT PROVISIONING
         services.AddScoped<TenantProvisioningService>();
+
+        // SEEDER
+        services.AddScoped<IDataSeeder, MasterDataSeeder>();
 
         // HANGFIRE
         services.AddHangfire(cfg =>

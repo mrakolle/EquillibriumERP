@@ -1,3 +1,5 @@
+
+namespace ManufacturingERP.Api.Tracing;
 public interface IRequestTracer
 {
     void Step(string message);

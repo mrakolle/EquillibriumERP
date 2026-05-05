@@ -2,7 +2,10 @@ using ManufacturingERP.Infrastructure.DependencyInjection;
 using ManufacturingERP.Infrastructure.MultiTenancy;
 using ManufacturingERP.Infrastructure.Services.Products;
 using ManufacturingERP.Application.Services.Products;
-using ManufacturingERP.Infrastructure.Data; 
+using ManufacturingERP.Application.Common.Interfaces;
+using ManufacturingERP.Infrastructure.Persistence;
+using ManufacturingERP.Api.Tracing;
+
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -35,15 +38,26 @@ builder.Services.AddInfrastructure(configuration);
 
 // ❌ DO NOT REGISTER TenantDbContext
 // builder.Services.AddDbContext<TenantDbContext>(); <-- NEVER again
+
 builder.Services.AddScoped<IRequestTracer, RequestTracer>();
-builder.Services.AddScoped<ExecutionContext>();
+builder.Services.AddScoped<RequestExecutionContext>();
 
 // -------------------------------------------------
 // BUILD
 // -------------------------------------------------
 
 var app = builder.Build();
-app.Environment.IsDevelopment();
+
+// =================================================
+// FIXED SEEDING (SAFE + IDPOTENT + NO DB LEAKAGE)
+// =================================================
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+
+    // ONLY ONE ENTRY POINT - Seeder handles ALL logic internally
+    await seeder.SeedAsync();
+}
 
 // -------------------------------------------------
 // PIPELINE

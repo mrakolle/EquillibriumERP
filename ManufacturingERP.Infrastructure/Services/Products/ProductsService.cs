@@ -1,6 +1,7 @@
 using ManufacturingERP.Application.Services.Products;
 using ManufacturingERP.Domain.Entities;
 using ManufacturingERP.Infrastructure.Data;
+using ManufacturingERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManufacturingERP.Infrastructure.Services.Products;

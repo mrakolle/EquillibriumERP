@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using ManufacturingERP.Infrastructure.Persistence;
 using System.IO;
 
 namespace ManufacturingERP.Infrastructure.Data;

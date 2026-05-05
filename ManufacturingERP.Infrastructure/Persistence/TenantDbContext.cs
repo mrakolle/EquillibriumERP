@@ -3,7 +3,7 @@ using ManufacturingERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace ManufacturingERP.Infrastructure.Data;
+namespace ManufacturingERP.Infrastructure.Persistence;
 
 public class TenantDbContext : DbContext
 {

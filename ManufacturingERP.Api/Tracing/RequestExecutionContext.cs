@@ -1,9 +1,11 @@
-public class ExecutionContext
+namespace ManufacturingERP.Api.Tracing;
+
+public class RequestExecutionContext
 {
-    private readonly ILogger<ExecutionContext> _logger;
+    private readonly ILogger<RequestExecutionContext> _logger;
     private readonly List<string> _steps = new();
 
-    public ExecutionContext(ILogger<ExecutionContext> logger)
+    public RequestExecutionContext(ILogger<RequestExecutionContext> logger)
     {
         _logger = logger;
     }

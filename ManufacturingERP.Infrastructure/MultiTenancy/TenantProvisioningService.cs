@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ManufacturingERP.Domain.Entities;
-using ManufacturingERP.Infrastructure.Data;
+using ManufacturingERP.Infrastructure.Persistence;
 
 namespace ManufacturingERP.Infrastructure.MultiTenancy;
 

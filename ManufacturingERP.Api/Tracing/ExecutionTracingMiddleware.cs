@@ -1,19 +1,23 @@
+namespace ManufacturingERP.Api.Tracing;
+
 public class ExecutionTracingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly RequestExecutionContext _trace;
 
-    public ExecutionTracingMiddleware(RequestDelegate next)
+    public ExecutionTracingMiddleware(RequestDelegate next, RequestExecutionContext trace)
     {
         _next = next;
+        _trace = trace;
     }
 
-    public async Task InvokeAsync(HttpContext context, ExecutionContext trace)
+    public async Task InvokeAsync(HttpContext context)
     {
-        trace.Step($"HTTP {context.Request.Method} {context.Request.Path}");
+        _trace.Step($"HTTP {context.Request.Method} {context.Request.Path}");
 
-        await _next(context);
+        await _next(context); // 🔥 REQUIRED
 
-        trace.Step("HTTP REQUEST COMPLETED");
-        trace.Dump();
+        _trace.Step("HTTP REQUEST COMPLETED");
+        _trace.Dump();
     }
 }
