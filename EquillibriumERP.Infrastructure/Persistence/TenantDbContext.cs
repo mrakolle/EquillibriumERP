@@ -24,10 +24,22 @@ public class TenantDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Inventory> Inventory => Set<Inventory>();
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
-    public DbSet<BOM> BOMs => Set<BOM>();
-    public DbSet<BOMItem> BOMItems => Set<BOMItem>();
+    public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
+    public DbSet<BillOfMaterial> BillOfMaterials => Set<BillOfMaterial>();
+    public DbSet<BillOfMaterialItem> BOMItems => Set<BillOfMaterialItem>();
     public DbSet<StockTransaction> StockTransactions => Set<StockTransaction>();
+  
     
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        optionsBuilder
+            .ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>()
+            .ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
     base.OnModelCreating(modelBuilder);
@@ -38,18 +50,49 @@ public class TenantDbContext : DbContext
         ConfigureBatch(modelBuilder);
         ConfigureQC(modelBuilder);
         ConfigureInventory(modelBuilder);
+        ConfigureBillOfMaterial(modelBuilder);
+        ConfigureBillOfMaterialItem(modelBuilder);
         
     }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    
+    private void ConfigureBillOfMaterial(ModelBuilder modelBuilder)
     {
-        base.OnConfiguring(optionsBuilder);
+        modelBuilder.Entity<BillOfMaterial>(entity =>
+        {
+            entity.ToTable("BillOfMaterials");
 
-        optionsBuilder
-            .ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>()
-            .ConfigureWarnings(warnings =>
-                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            entity.HasMany(b => b.Items)
+                .WithOne(i => i.BillOfMaterial)
+                .HasForeignKey(i => i.BillOfMaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(b => b.Product)
+                .WithMany()
+                .HasForeignKey(b => b.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
+    private void ConfigureBillOfMaterialItem(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BillOfMaterialItem>(entity =>
+        {
+            entity.ToTable("BillOfMaterialItems");
 
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.WastagePercent)
+                .HasPrecision(5, 2);
+
+            entity.HasOne(i => i.RawMaterial)
+                .WithMany()
+                .HasForeignKey(i => i.RawMaterialId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(i => new { i.BillOfMaterialId, i.RawMaterialId })
+                .IsUnique();
+        });
+    }
     private void ConfigureFormulation(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Formulation>(entity =>
