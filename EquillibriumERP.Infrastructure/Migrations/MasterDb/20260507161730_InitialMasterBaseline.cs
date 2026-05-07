@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EquillibriumERP.Infrastructure.Migrations.MasterDb
 {
     /// <inheritdoc />
-    public partial class SyncMasterSchema : Migration
+    public partial class InitialMasterBaseline : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
