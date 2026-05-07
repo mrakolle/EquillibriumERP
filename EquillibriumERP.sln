@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManufacturingERP.Api", "ManufacturingERP.Api\ManufacturingERP.Api.csproj", "{97BA4BDA-7EFA-4E62-A799-F821837DA5DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquillibriumERP.Api", "EquillibriumERP.Api\EquillibriumERP.Api.csproj", "{97BA4BDA-7EFA-4E62-A799-F821837DA5DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManufacturingERP.Application", "ManufacturingERP.Application\ManufacturingERP.Application.csproj", "{9F062BC0-EA78-4909-8867-66FFAEC432CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquillibriumERP.Application", "EquillibriumERP.Application\EquillibriumERP.Application.csproj", "{9F062BC0-EA78-4909-8867-66FFAEC432CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManufacturingERP.Domain", "ManufacturingERP.Domain\ManufacturingERP.Domain.csproj", "{EE29AA6F-563D-47A5-951B-457A830168F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquillibriumERP.Domain", "EquillibriumERP.Domain\EquillibriumERP.Domain.csproj", "{EE29AA6F-563D-47A5-951B-457A830168F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManufacturingERP.Infrastructure", "ManufacturingERP.Infrastructure\ManufacturingERP.Infrastructure.csproj", "{7ECBB088-3C07-43B3-A46D-31F70C7DF5D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquillibriumERP.Infrastructure", "EquillibriumERP.Infrastructure\EquillibriumERP.Infrastructure.csproj", "{7ECBB088-3C07-43B3-A46D-31F70C7DF5D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

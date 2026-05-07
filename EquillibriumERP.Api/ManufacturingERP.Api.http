@@ -1,0 +1,6 @@
+@ManufacturingERP.Api_HostAddress = http://localhost:5175/Swagger
+
+GET {{ManufacturingERP.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
