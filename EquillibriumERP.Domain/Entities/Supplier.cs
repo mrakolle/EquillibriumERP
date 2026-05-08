@@ -14,5 +14,6 @@ public class Supplier : BaseEntity
     public string RegistrationNumber { get; set; } = null!;
 
     public ICollection<Branch> Branches { get; set; } = new List<Branch>();
-    public ICollection<SupplierRawMaterial> Materials { get; set; } = new List<SupplierRawMaterial>();
+    public ICollection<SupplierRawMaterial> SupplierRawMaterials { get; set; }
+    = new List<SupplierRawMaterial>();
 }

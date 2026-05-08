@@ -28,7 +28,7 @@ namespace EquillibriumERP.Infrastructure.Persistence
             ConfigureRawMaterialMaster(modelBuilder);
             ConfigureSupplier(modelBuilder);
             ConfigureBranch(modelBuilder);
-            ConfigureSupplierRawMaterial(modelBuilder);
+            //ConfigureSupplierRawMaterial(modelBuilder);
         }
         private void ConfigureTenant(ModelBuilder modelBuilder)
         {
@@ -92,17 +92,22 @@ namespace EquillibriumERP.Infrastructure.Persistence
         {
             modelBuilder.Entity<SupplierRawMaterial>(entity =>
             {
-                entity.ToTable("SupplierRawMaterials", "public");
+                entity.ToTable("SupplierRawMaterial");
 
-                entity.HasKey(x => new { x.SupplierId, x.RawMaterialMasterId });
+                entity.HasKey(x => new { x.SupplierId, x.RawMaterialId });
 
                 entity.HasOne(x => x.Supplier)
-                    .WithMany(x => x.Materials)
-                    .HasForeignKey(x => x.SupplierId);
+                    .WithMany(s => s.SupplierRawMaterials)
+                    .HasForeignKey(x => x.SupplierId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(x => x.RawMaterial)
-                    .WithMany(x => x.Suppliers)
-                    .HasForeignKey(x => x.RawMaterialMasterId);
+                    .WithMany(r => r.SupplierRawMaterials)
+                    .HasForeignKey(x => x.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.SupplierId, x.RawMaterialId })
+                    .IsUnique();
             });
         }
     }

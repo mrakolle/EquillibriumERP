@@ -26,8 +26,9 @@ public class TenantDbContext : DbContext
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
     public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
     public DbSet<BillOfMaterial> BillOfMaterials => Set<BillOfMaterial>();
-    public DbSet<BillOfMaterialItem> BOMItems => Set<BillOfMaterialItem>();
+    public DbSet<BillOfMaterialItem> BillOfMaterialItems => Set<BillOfMaterialItem>();
     public DbSet<StockTransaction> StockTransactions => Set<StockTransaction>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
   
     
     
@@ -52,9 +53,38 @@ public class TenantDbContext : DbContext
         ConfigureInventory(modelBuilder);
         ConfigureBillOfMaterial(modelBuilder);
         ConfigureBillOfMaterialItem(modelBuilder);
+        ConfigureSupplierRawMaterial(modelBuilder);
+        ConfigureSupplier(modelBuilder);
         
     }
-    
+    private void ConfigureSupplierRawMaterial(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SupplierRawMaterial>(entity =>
+        {
+            entity.ToTable("SupplierRawMaterial");
+
+            entity.HasKey(x => x.Id); // IMPORTANT if you added Id
+
+            entity.HasOne(x => x.Supplier)
+                .WithMany(s => s.SupplierRawMaterials)
+                .HasForeignKey(x => x.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.RawMaterial)
+                .WithMany(r => r.SupplierRawMaterials)
+                .HasForeignKey(x => x.RawMaterialId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.RawMaterialId); // 👈 THIS replaces the migration line
+
+            entity.HasIndex(x => new { x.SupplierId, x.RawMaterialId })
+                .IsUnique();
+        });
+    }
+    private void ConfigureSupplier(ModelBuilder modelBuilder)
+    {
+        
+    }
     private void ConfigureBillOfMaterial(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BillOfMaterial>(entity =>

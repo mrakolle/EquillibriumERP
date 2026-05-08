@@ -24,5 +24,8 @@
     <ProjectReference Include="..\EquillibriumERP.Infrastructure\EquillibriumERP.Infrastructure.csproj" />
     <!-- <ProjectReference Include="..\EquillibriumERP.Domain\EquillibriumERP.Domain.csproj" /> -->
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Persistence\Seed\*.cs" />
+  </ItemGroup>
 
 </Project>

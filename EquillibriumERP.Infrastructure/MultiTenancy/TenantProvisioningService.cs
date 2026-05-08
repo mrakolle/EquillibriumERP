@@ -9,14 +9,14 @@ namespace EquillibriumERP.Infrastructure.MultiTenancy;
 public class TenantProvisioningService
 {
     private readonly TenantDbContextFactory _factory;
-    private readonly MasterDbContext _publicDb;
+    private readonly MasterDbContext _masterDb;
 
     public TenantProvisioningService(
         TenantDbContextFactory factory,
         MasterDbContext publicDb)
     {
         _factory = factory;
-        _publicDb = publicDb;
+        _masterDb = publicDb;
     }
 
     public async Task<Tenant> CreateTenantAsync(string tenantName)
@@ -35,8 +35,8 @@ public class TenantProvisioningService
             IsActive = true
         };
 
-        _publicDb.Tenants.Add(tenant);
-        await _publicDb.SaveChangesAsync();
+        _masterDb.Tenants.Add(tenant);
+        await _masterDb.SaveChangesAsync();
 
         // 3. Create tenant context
         await using var context = _factory.Create(tenantSchema);

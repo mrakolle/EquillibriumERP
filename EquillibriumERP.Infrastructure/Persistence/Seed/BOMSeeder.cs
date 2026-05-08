@@ -1,57 +1,50 @@
+using Microsoft.EntityFrameworkCore;
 using EquillibriumERP.Domain.Entities;
 
 namespace EquillibriumERP.Infrastructure.Persistence.Seed;
 
 public static class BOMSeeder
 {
-    public static void Seed(TenantDbContext context)
+    public static async Task SeedAsync(TenantDbContext context)
     {
-        if (context.BillOfMaterials.Any())
+        var existingCount = await context.BillOfMaterials.CountAsync();
+
+        if (existingCount > 0)
             return;
 
-        var product = context.Products.FirstOrDefault();
-        var materials = context.RawMaterials.ToList();
+        var product = await context.Products.FirstOrDefaultAsync();
+        var rawMaterial = await context.RawMaterials.FirstOrDefaultAsync();
 
-        if (product == null || !materials.Any())
+        if (product == null || rawMaterial == null)
             return;
 
-        var bom = CreateDishwashingLiquidBOM(product.Id, materials);
-
-        context.BillOfMaterials.Add(bom);
-    }
-
-    private static BillOfMaterial CreateDishwashingLiquidBOM(Guid productId, List<RawMaterial> materials)
-    {
-        RawMaterial Get(string name) =>
-            materials.First(x => x.RawMaterialMaster.Name == name);
-
-        var sles = Get("SLES");
-        var capb = Get("CAPB");
-        var salt = Get("Sodium Chloride");
-        var fragrance = Get("Fragrance");
-        var dye = Get("Blue Dye");
-        var preservative = Get("Preservative");
-        var water = Get("Water");
-
-        return new BillOfMaterial
+        var bom = new BillOfMaterial
         {
-            ProductId = productId,
-            BOMCode = "BOM-DW-5L-001",
-            Name = "5L Dishwashing Liquid - Blue Formula",
+            Id = Guid.NewGuid(),
+            ProductId = product.Id,
+            BOMCode = "BOM-001",
+            Name = "Dishwashing Liquid Formula",
             Version = "1.0",
             IsActive = true,
             EffectiveDate = DateTime.UtcNow,
-
-            Items = new List<BillOfMaterialItem>
-            {
-                new() { RawMaterialId = sles.Id, Quantity = 0.8m, UnitOfMeasure = "kg", WastagePercent = 1 },
-                new() { RawMaterialId = capb.Id, Quantity = 0.5m, UnitOfMeasure = "kg", WastagePercent = 1 },
-                new() { RawMaterialId = salt.Id, Quantity = 0.2m, UnitOfMeasure = "kg", WastagePercent = 0 },
-                new() { RawMaterialId = fragrance.Id, Quantity = 0.05m, UnitOfMeasure = "kg", WastagePercent = 2 },
-                new() { RawMaterialId = dye.Id, Quantity = 0.01m, UnitOfMeasure = "kg", WastagePercent = 0 },
-                new() { RawMaterialId = preservative.Id, Quantity = 0.02m, UnitOfMeasure = "kg", WastagePercent = 0 },
-                new() { RawMaterialId = water.Id, Quantity = 3.42m, UnitOfMeasure = "kg", WastagePercent = 0 }
-            }
+            CreatedAt = DateTime.UtcNow
         };
+
+        var bomItem = new BillOfMaterialItem
+        {
+            Id = Guid.NewGuid(),
+            BillOfMaterialId = bom.Id,
+            RawMaterialId = rawMaterial.Id,
+            Quantity = 10,
+            UnitOfMeasure = "KG",
+            WastagePercent = 2,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await context.BillOfMaterials.AddAsync(bom);
+        await context.BillOfMaterialItems.AddAsync(bomItem);
+
+        await context.SaveChangesAsync();
     }
 }

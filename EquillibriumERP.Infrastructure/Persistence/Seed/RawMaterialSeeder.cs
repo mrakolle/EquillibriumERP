@@ -1,53 +1,42 @@
+using Microsoft.EntityFrameworkCore;
 using EquillibriumERP.Domain.Entities;
 
 namespace EquillibriumERP.Infrastructure.Persistence.Seed;
 
 public static class RawMaterialSeeder
 {
-    public static void Seed(TenantDbContext context)
+    public static async Task SeedAsync(TenantDbContext context)
     {
-        if (context.RawMaterials.Any())
+        var existingCount = await context.RawMaterials.CountAsync();
+
+        if (existingCount > 0)
             return;
 
         var materials = new List<RawMaterial>
         {
-            new()
+            new RawMaterial
             {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "SLES")
+                Id = Guid.NewGuid(),
+                CASNumber = "68585-34-2",
+                SDSAttachmentPath = "sds/sles.pdf",
+                CurrentCost = 25.50m,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
             },
-            new()
+
+            new RawMaterial
             {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "CAPB")
-            },
-            new()
-            {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "Sodium Chloride")
-            },
-            new()
-            {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "Fragrance")
-            },
-            new()
-            {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "Blue Dye")
-            },
-            new()
-            {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "Preservative")
-            },
-            new()
-            {
-                RawMaterialMaster = context.Set<RawMaterialMaster>()
-                    .First(x => x.Name == "Water")
+                Id = Guid.NewGuid(),
+                CASNumber = "9004-82-4",
+                SDSAttachmentPath = "sds/cdea.pdf",
+                CurrentCost = 18.75m,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
             }
         };
 
-        context.RawMaterials.AddRange(materials);
+        await context.RawMaterials.AddRangeAsync(materials);
+
+        await context.SaveChangesAsync();
     }
 }

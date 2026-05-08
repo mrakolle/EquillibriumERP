@@ -13,12 +13,12 @@
 
       "serverReadyAction": {
         "action": "openExternally",
-        "uriFormat": "http://localhost:5175/swagger/index.html"
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
       },
 
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:5175;https://localhost:7060/swagger/index.html"
+        "ASPNETCORE_URLS": "http://localhost:5175;https://localhost:7060"
       }
     },
     {

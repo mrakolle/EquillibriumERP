@@ -1,24 +1,38 @@
+using Microsoft.EntityFrameworkCore;
 using EquillibriumERP.Domain.Entities;
 
 namespace EquillibriumERP.Infrastructure.Persistence.Seed;
 
 public static class ProductSeeder
 {
-    public static void Seed(TenantDbContext context)
+    public static async Task SeedAsync(TenantDbContext context)
     {
-        if (context.Products.Any())
+        var existingCount = await context.Products.CountAsync();
+
+        if (existingCount > 0)
             return;
 
         var products = new List<Product>
         {
-            new()
+            new Product
             {
-                Name = "5L Dishwashing Liquid",
-                //Description = "Blue dishwashing liquid",
-                SKU = "DW-5L-001"
+                Id = Guid.NewGuid(),
+                Name = "Dishwashing Liquid 5L",
+                SKU = "DWL-5L",
+                CreatedAt = DateTime.UtcNow
+            },
+
+            new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Laundry Detergent 2L",
+                SKU = "LDRY-2L",
+                CreatedAt = DateTime.UtcNow
             }
         };
 
-        context.Products.AddRange(products);
+        await context.Products.AddRangeAsync(products);
+
+        await context.SaveChangesAsync();
     }
 }
