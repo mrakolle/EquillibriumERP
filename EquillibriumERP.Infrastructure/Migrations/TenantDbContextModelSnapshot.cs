@@ -160,7 +160,8 @@ namespace EquillibriumERP.Infrastructure.Migrations
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<decimal>("WastagePercent")
                         .HasPrecision(5, 2)
@@ -173,7 +174,7 @@ namespace EquillibriumERP.Infrastructure.Migrations
                     b.HasIndex("BillOfMaterialId", "RawMaterialId")
                         .IsUnique();
 
-                    b.ToTable("BillOfMaterialItems", (string)null);
+                    b.ToTable("BillOfMaterialItems");
                 });
 
             modelBuilder.Entity("EquillibriumERP.Domain.Entities.Branch", b =>
@@ -476,7 +477,15 @@ namespace EquillibriumERP.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("SDSAttachmentPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -540,7 +549,13 @@ namespace EquillibriumERP.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Supplier");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("RegistrationNumber")
+                        .IsUnique();
+
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("EquillibriumERP.Domain.Entities.SupplierRawMaterial", b =>
@@ -552,18 +567,17 @@ namespace EquillibriumERP.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LeadTimeDays")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("PricePerKg")
-                        .HasColumnType("numeric");
+                    b.Property<int>("LeadTimeDays")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("RawMaterialId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("SupplierId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -663,7 +677,7 @@ namespace EquillibriumERP.Infrastructure.Migrations
                     b.HasOne("EquillibriumERP.Domain.Entities.Supplier", "Supplier")
                         .WithMany("Branches")
                         .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Supplier");

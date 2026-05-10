@@ -1,4 +1,87 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using EquillibriumERP.Domain.Entities;
+
+namespace EquillibriumERP.Infrastructure.Persistence;
+
+public class TenantDbContext : DbContext
+{
+    private readonly string _schema;
+
+    public string Schema => _schema;
+
+    public TenantDbContext(
+        DbContextOptions<TenantDbContext> options,
+        string schema)
+        : base(options)
+    {
+        EfContextGuard.Validate(this);
+
+        _schema = schema;
+
+        Console.WriteLine($"🚨 DbContext CREATED WITH SCHEMA: {_schema}");
+    }
+
+    // =====================================================
+    // DbSets
+    // =====================================================
+
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Inventory> Inventory => Set<Inventory>();
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+    public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
+    public DbSet<BillOfMaterial> BillOfMaterials => Set<BillOfMaterial>();
+    public DbSet<BillOfMaterialItem> BillOfMaterialItems => Set<BillOfMaterialItem>();
+    public DbSet<StockTransaction> StockTransactions => Set<StockTransaction>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<SupplierRawMaterial> SupplierRawMaterials
+    => Set<SupplierRawMaterial>();
+
+    // =====================================================
+    // EF CONFIG
+    // =====================================================
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        optionsBuilder
+            .ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>()
+            .ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // 🔥 THIS replaces ALL ConfigureXYZ methods
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(TenantDbContext).Assembly);
+    }
+}
+
+internal class TenantModelCacheKeyFactory : IModelCacheKeyFactory
+{
+    public object Create(DbContext context, bool designTime)
+    {
+        var tenantContext = (TenantDbContext)context;
+
+        return (
+            context.GetType(),
+            tenantContext.Schema,
+            designTime
+        );
+    }
+}
+
+
+/////////////////////////////////////////////////////////
+/// Old DbContext
+/// ////////////////////////////////////////////////////
+/// 
+/*using Microsoft.EntityFrameworkCore;
 using EquillibriumERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -63,7 +146,7 @@ public class TenantDbContext : DbContext
         {
             entity.ToTable("SupplierRawMaterial");
 
-            entity.HasKey(x => x.Id); // IMPORTANT if you added Id
+            entity.HasKey(x => x.Id); 
 
             entity.HasOne(x => x.Supplier)
                 .WithMany(s => s.SupplierRawMaterials)
@@ -83,7 +166,28 @@ public class TenantDbContext : DbContext
     }
     private void ConfigureSupplier(ModelBuilder modelBuilder)
     {
-        
+        modelBuilder.Entity<Supplier>(entity =>
+        {
+            entity.ToTable("Suppliers");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasMany(x => x.Branches)
+                .WithOne(x => x.Supplier)
+                .HasForeignKey(x => x.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(x => x.SupplierRawMaterials)
+                .WithOne(x => x.Supplier)
+                .HasForeignKey(x => x.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.Email)
+                .IsUnique();
+
+            entity.HasIndex(x => x.RegistrationNumber)
+                .IsUnique();
+        });
     }
     private void ConfigureBillOfMaterial(ModelBuilder modelBuilder)
     {
@@ -234,4 +338,4 @@ internal class TenantModelCacheKeyFactory : IModelCacheKeyFactory
         var tenantContext = (TenantDbContext)context;
         return (context.GetType(), tenantContext.Schema, designTime);
     }
-}
+}*/

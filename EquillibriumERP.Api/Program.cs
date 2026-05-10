@@ -4,6 +4,9 @@ using EquillibriumERP.Infrastructure.Services.Products;
 using EquillibriumERP.Application.Services.Products;
 using EquillibriumERP.Application.Common.Interfaces;
 using EquillibriumERP.Infrastructure.Persistence;
+using EquillibriumERP.Infrastructure.Persistence.Seed.Registry;
+using EquillibriumERP.Infrastructure.Persistence.Seed.Abstractions;
+using EquillibriumERP.Infrastructure.Persistence.Seed.Manufacturing;
 using EquillibriumERP.Api.Tracing;
 
 using FluentValidation;
@@ -33,11 +36,28 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateProductRequestValidat
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 🔥 Infrastructure (MasterDbContext lives here)
+// 🔥 Infrastructure
 builder.Services.AddInfrastructure(configuration);
 
-// ❌ DO NOT REGISTER TenantDbContext
-// builder.Services.AddDbContext<TenantDbContext>(); <-- NEVER again
+// ❌ NEVER register TenantDbContext directly
+// builder.Services.AddDbContext<TenantDbContext>();
+
+// -------------------------------------------------
+// SEEDER REGISTRY
+// -------------------------------------------------
+
+builder.Services.AddScoped<SeederRegistry>();
+
+// Manufacturing seeders
+builder.Services.AddScoped<ISeeder, SupplierSeeder>();
+builder.Services.AddScoped<ISeeder, RawMaterialSeeder>();
+builder.Services.AddScoped<ISeeder, ProductSeeder>();
+builder.Services.AddScoped<ISeeder, BomSeeder>();
+builder.Services.AddScoped<ISeeder, SupplierRawMaterialSeeder>();
+
+// -------------------------------------------------
+// TRACING
+// -------------------------------------------------
 
 builder.Services.AddScoped<IRequestTracer, RequestTracer>();
 builder.Services.AddScoped<RequestExecutionContext>();
@@ -47,17 +67,6 @@ builder.Services.AddScoped<RequestExecutionContext>();
 // -------------------------------------------------
 
 var app = builder.Build();
-
-// =================================================
-// FIXED SEEDING (SAFE + IDPOTENT + NO DB LEAKAGE)
-// =================================================
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-
-    // ONLY ONE ENTRY POINT - Seeder handles ALL logic internally
-    await seeder.SeedAsync();
-}
 
 // -------------------------------------------------
 // PIPELINE
@@ -69,7 +78,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// 🔥 CRITICAL: tenant resolution BEFORE controllers
+// 🔥 CRITICAL:
+// Tenant resolution MUST happen BEFORE controllers
 app.UseMiddleware<TenantMiddleware>();
 
 app.UseAuthorization();

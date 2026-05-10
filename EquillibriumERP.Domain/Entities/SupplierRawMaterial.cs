@@ -10,6 +10,6 @@ namespace EquillibriumERP.Domain.Entities;
     public Guid RawMaterialId { get; set; }
     public RawMaterial RawMaterial { get; set; } = null!;
 
-    public decimal PricePerKg { get; set; }
-    public string LeadTimeDays { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public int LeadTimeDays { get; set; }
 }

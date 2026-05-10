@@ -149,8 +149,8 @@ namespace EquillibriumERP.Infrastructure.Persistence.Seed
                     {
                         SupplierId = supplier.Id,
                         //RawMaterialMasterId = material.Id,
-                        PricePerKg = (decimal)(10 + rnd.NextDouble() * 120),
-                        LeadTimeDays = rnd.Next(2, 10).ToString()
+                        UnitPrice = (decimal)(10 + rnd.NextDouble() * 120),
+                        LeadTimeDays = rnd.Next(2, 10)
                     });
                 }
             }
